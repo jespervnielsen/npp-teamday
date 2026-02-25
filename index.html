@@ -14,21 +14,52 @@ body {
     overflow: hidden;
 }
 
+/* Flash effects */
+.flash, .redflash {
+    position: fixed;
+    inset: 0;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 9999;
+}
+.flash { background: white; }
+.redflash { background: red; z-index: 9998; }
+
+/* Flicker */
+@keyframes flicker {
+    0% { opacity: 0.9; }
+    5% { opacity: 0.4; }
+    10% { opacity: 1; }
+    15% { opacity: 0.3; }
+    20% { opacity: 1; }
+    100% { opacity: 1; }
+}
+.flicker { animation: flicker 1.5s linear forwards; }
+
+/* Jitter */
+@keyframes jitter {
+    0% { transform: translate(0,0); }
+    20% { transform: translate(-2px,1px); }
+    40% { transform: translate(2px,-1px); }
+    60% { transform: translate(-1px,2px); }
+    80% { transform: translate(1px,-2px); }
+    100% { transform: translate(0,0); }
+}
+.jitter { animation: jitter 0.2s infinite; }
+
 .container {
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
     height: 100vh;
-    flex-direction: column;
     text-align: center;
 }
 
-.hidden {
-    display: none;
-}
+.hidden { display: none; }
 
 .glitch {
-    font-size: 3rem;
+    font-size: 2.8rem;
     animation: glitch 1s infinite;
 }
 
@@ -42,20 +73,17 @@ body {
     border: 6px solid rgba(0,255,136,0.2);
     border-top: 6px solid #00ff88;
     border-radius: 50%;
-    width: 60px;
-    height: 60px;
+    width: 70px;
+    height: 70px;
     animation: spin 1s linear infinite;
     margin: 30px 0;
 }
-
-@keyframes spin {
-    to { transform: rotate(360deg); }
-}
+@keyframes spin { to { transform: rotate(360deg); } }
 
 .terminal {
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     margin-top: 20px;
-    min-height: 80px;
+    min-height: 100px;
 }
 
 video {
@@ -75,9 +103,32 @@ video {
     );
     pointer-events: none;
 }
+
+/* Fake internal URL */
+.fake-url {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background: #111;
+    color: #00ff88;
+    padding: 8px 15px;
+    font-size: 0.9rem;
+    text-align: left;
+    border-bottom: 1px solid #00ff88;
+    opacity: 0.8;
+}
 </style>
 </head>
 <body>
+
+<div class="flash" id="flash"></div>
+<div class="redflash" id="redflash"></div>
+<div class="scanline"></div>
+
+<div class="fake-url">
+https://intranet.secure-node.local/alpha-7
+</div>
 
 <div class="container" id="bootSequence">
     <div class="glitch">UNAUTHORIZED SIGNAL DETECTED</div>
@@ -90,19 +141,62 @@ video {
     <p>Agent authentication required. Press play.</p>
     <video controls>
         <source src="mission.mp4" type="video/mp4">
-        Din browser understøtter ikke video.
     </video>
 </div>
 
-<div class="scanline"></div>
-
 <script>
+// Boot flash sequence
+function bootSequence() {
+    const flash = document.getElementById("flash");
+    const redflash = document.getElementById("redflash");
 
+    setTimeout(() => flash.style.opacity = 1, 200);
+    setTimeout(() => flash.style.opacity = 0, 350);
+
+    setTimeout(() => flash.style.opacity = 1, 600);
+    setTimeout(() => flash.style.opacity = 0, 750);
+
+    setTimeout(() => flash.style.opacity = 1, 1000);
+    setTimeout(() => flash.style.opacity = 0, 1150);
+
+    setTimeout(() => redflash.style.opacity = 0.7, 1500);
+    setTimeout(() => redflash.style.opacity = 0, 1700);
+
+    setTimeout(() => {
+        document.body.classList.add("flicker");
+        document.body.classList.add("jitter");
+    }, 1800);
+
+    setTimeout(() => {
+        document.body.classList.remove("jitter");
+    }, 3800);
+}
+bootSequence();
+
+// Fake routing animation
+const fakeRoutes = [
+    "/proxy/init",
+    "/tunnel/create",
+    "/aes256/handshake",
+    "/node/validated",
+    "/secure/transmission-ready"
+];
+let routeIndex = 0;
+let routeInterval = setInterval(() => {
+    if (routeIndex < fakeRoutes.length) {
+        history.pushState({}, "", fakeRoutes[routeIndex]);
+        routeIndex++;
+    } else {
+        clearInterval(routeInterval);
+    }
+}, 3000);
+
+// Terminal typing
 const messages = [
 ">>> Establishing encrypted tunnel...",
 ">>> AES-256 handshake initiated...",
 ">>> Routing via secure proxy...",
-">>> Internal systems compromised...",
+">>> Internal communication compromised...",
 ">>> Switching to visual protocol...",
 ">>> Awaiting agent authentication..."
 ];
@@ -125,15 +219,13 @@ function typeWriter() {
         }
     }
 }
-
 typeWriter();
 
-// 60 sekunders boot sequence
+// After 60 seconds show video
 setTimeout(() => {
     document.getElementById("bootSequence").classList.add("hidden");
     document.getElementById("videoContainer").classList.remove("hidden");
 }, 60000);
-
 </script>
 
 </body>
