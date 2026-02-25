@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Secure Transmission</title>
+<title>Secure Transmission Node</title>
 
 <style>
 body {
@@ -14,76 +14,79 @@ body {
     overflow: hidden;
 }
 
-/* Flash effects */
-.flash, .redflash {
+/* FLASH OVERLAY */
+.flash {
     position: fixed;
     inset: 0;
+    background: white;
     opacity: 0;
     pointer-events: none;
     z-index: 9999;
 }
-.flash { background: white; }
-.redflash { background: red; z-index: 9998; }
+
+.redflash {
+    position: fixed;
+    inset: 0;
+    background: red;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 9998;
+}
 
 /* Flicker */
 @keyframes flicker {
-    0% { opacity: 0.9; }
-    5% { opacity: 0.4; }
-    10% { opacity: 1; }
-    15% { opacity: 0.3; }
+    0% { opacity: 1; }
+    10% { opacity: 0.3; }
     20% { opacity: 1; }
+    30% { opacity: 0.2; }
+    40% { opacity: 1; }
     100% { opacity: 1; }
 }
-.flicker { animation: flicker 1.5s linear forwards; }
-
-/* Jitter */
-@keyframes jitter {
-    0% { transform: translate(0,0); }
-    20% { transform: translate(-2px,1px); }
-    40% { transform: translate(2px,-1px); }
-    60% { transform: translate(-1px,2px); }
-    80% { transform: translate(1px,-2px); }
-    100% { transform: translate(0,0); }
-}
-.jitter { animation: jitter 0.2s infinite; }
-
-.container {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    text-align: center;
+.flicker {
+    animation: flicker 2s infinite;
 }
 
-.hidden { display: none; }
-
-.glitch {
-    font-size: 2.8rem;
-    animation: glitch 1s infinite;
-}
-
+/* Glitch text */
 @keyframes glitch {
     0% { text-shadow: 2px 0 red, -2px 0 blue; }
     50% { text-shadow: -2px 0 red, 2px 0 blue; }
     100% { text-shadow: 2px 0 red, -2px 0 blue; }
 }
 
+.glitch {
+    font-size: 2.5rem;
+    animation: glitch 1s infinite;
+    text-align: center;
+}
+
+/* Container */
+.container {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Spinner */
 .spinner {
     border: 6px solid rgba(0,255,136,0.2);
     border-top: 6px solid #00ff88;
     border-radius: 50%;
-    width: 70px;
-    height: 70px;
+    width: 80px;
+    height: 80px;
     animation: spin 1s linear infinite;
-    margin: 30px 0;
+    margin: 40px 0;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 
 .terminal {
     font-size: 1.1rem;
     margin-top: 20px;
-    min-height: 100px;
+    min-height: 160px;
+    width: 70%;
+    text-align: left;
 }
 
 video {
@@ -92,31 +95,18 @@ video {
     box-shadow: 0 0 20px #00ff88;
 }
 
+.hidden { display: none; }
+
+/* Scanlines */
 .scanline {
     position: fixed;
-    width: 100%;
-    height: 100%;
+    inset: 0;
     background: repeating-linear-gradient(
         transparent,
         transparent 2px,
         rgba(0,255,136,0.03) 3px
     );
     pointer-events: none;
-}
-
-/* Fake internal URL */
-.fake-url {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    background: #111;
-    color: #00ff88;
-    padding: 8px 15px;
-    font-size: 0.9rem;
-    text-align: left;
-    border-bottom: 1px solid #00ff88;
-    opacity: 0.8;
 }
 </style>
 </head>
@@ -126,18 +116,14 @@ video {
 <div class="redflash" id="redflash"></div>
 <div class="scanline"></div>
 
-<div class="fake-url">
-https://intranet.secure-node.local/alpha-7
-</div>
-
 <div class="container" id="bootSequence">
-    <div class="glitch">UNAUTHORIZED SIGNAL DETECTED</div>
+    <div class="glitch">SECURE CHANNEL INITIALISING</div>
     <div class="spinner"></div>
     <div class="terminal" id="terminal"></div>
 </div>
 
 <div class="container hidden" id="videoContainer">
-    <div class="glitch">SECURE TRANSMISSION READY</div>
+    <div class="glitch">TRANSMISSION READY</div>
     <p>Agent authentication required. Press play.</p>
     <video controls>
         <source src="mission.mp4" type="video/mp4">
@@ -145,60 +131,42 @@ https://intranet.secure-node.local/alpha-7
 </div>
 
 <script>
-// Boot flash sequence
-function bootSequence() {
+
+// Aggressive startup flash
+function introFlash() {
     const flash = document.getElementById("flash");
     const redflash = document.getElementById("redflash");
 
-    setTimeout(() => flash.style.opacity = 1, 200);
-    setTimeout(() => flash.style.opacity = 0, 350);
+    setTimeout(() => flash.style.opacity = 1, 100);
+    setTimeout(() => flash.style.opacity = 0, 250);
 
-    setTimeout(() => flash.style.opacity = 1, 600);
-    setTimeout(() => flash.style.opacity = 0, 750);
+    setTimeout(() => flash.style.opacity = 1, 500);
+    setTimeout(() => flash.style.opacity = 0, 650);
 
-    setTimeout(() => flash.style.opacity = 1, 1000);
-    setTimeout(() => flash.style.opacity = 0, 1150);
-
-    setTimeout(() => redflash.style.opacity = 0.7, 1500);
-    setTimeout(() => redflash.style.opacity = 0, 1700);
+    setTimeout(() => redflash.style.opacity = 0.8, 900);
+    setTimeout(() => redflash.style.opacity = 0, 1100);
 
     setTimeout(() => {
         document.body.classList.add("flicker");
-        document.body.classList.add("jitter");
-    }, 1800);
-
-    setTimeout(() => {
-        document.body.classList.remove("jitter");
-    }, 3800);
+    }, 1200);
 }
-bootSequence();
 
-// Fake routing animation
-const fakeRoutes = [
-    "/proxy/init",
-    "/tunnel/create",
-    "/aes256/handshake",
-    "/node/validated",
-    "/secure/transmission-ready"
-];
-let routeIndex = 0;
-let routeInterval = setInterval(() => {
-    if (routeIndex < fakeRoutes.length) {
-        history.pushState({}, "", fakeRoutes[routeIndex]);
-        routeIndex++;
-    } else {
-        clearInterval(routeInterval);
-    }
-}, 3000);
+introFlash();
 
-// Terminal typing
+
+// Long terminal simulation
 const messages = [
+">>> Incoming override signal...",
+">>> Verifying node integrity...",
 ">>> Establishing encrypted tunnel...",
+">>> Generating session keys...",
 ">>> AES-256 handshake initiated...",
-">>> Routing via secure proxy...",
-">>> Internal communication compromised...",
-">>> Switching to visual protocol...",
-">>> Awaiting agent authentication..."
+">>> Routing via offshore relay...",
+">>> Bypassing internal firewall...",
+">>> Masking origin...",
+">>> Switching to visual-only protocol...",
+">>> Awaiting field agents...",
+">>> Channel stabilising..."
 ];
 
 let terminal = document.getElementById("terminal");
@@ -210,22 +178,27 @@ function typeWriter() {
         if (charIndex < messages[msgIndex].length) {
             terminal.innerHTML += messages[msgIndex].charAt(charIndex);
             charIndex++;
-            setTimeout(typeWriter, 30);
+            setTimeout(typeWriter, 25);
         } else {
             terminal.innerHTML += "<br>";
             msgIndex++;
             charIndex = 0;
-            setTimeout(typeWriter, 400);
+            setTimeout(typeWriter, 800);
         }
     }
 }
-typeWriter();
 
-// After 60 seconds show video
+// Start typing after 2 sec
+setTimeout(typeWriter, 2000);
+
+
+// TOTAL DELAY BEFORE VIDEO (3 minutes)
 setTimeout(() => {
     document.getElementById("bootSequence").classList.add("hidden");
     document.getElementById("videoContainer").classList.remove("hidden");
-}, 60000);
+    document.body.classList.remove("flicker");
+}, 180000); // 180000 ms = 3 minutter
+
 </script>
 
 </body>
