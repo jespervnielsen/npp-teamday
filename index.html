@@ -149,18 +149,48 @@ function introFlash() {
     const flash = document.getElementById("flash");
     const redflash = document.getElementById("redflash");
 
-    setTimeout(() => flash.style.opacity = 1, 100);
-    setTimeout(() => flash.style.opacity = 0, 250);
+    let timeline = [
+        { t: 100,  type: "white" },
+        { t: 250,  type: "off" },
 
-    setTimeout(() => flash.style.opacity = 1, 500);
-    setTimeout(() => flash.style.opacity = 0, 650);
+        { t: 420,  type: "red" },
+        { t: 600,  type: "off" },
 
-    setTimeout(() => redflash.style.opacity = 0.8, 900);
-    setTimeout(() => redflash.style.opacity = 0, 1100);
+        { t: 750,  type: "white" },
+        { t: 900,  type: "off" },
 
+        { t: 1050, type: "red" },
+        { t: 1200, type: "off" },
+
+        { t: 1350, type: "white" },
+        { t: 1450, type: "off" },
+
+        // hurtigere crescendo
+        { t: 1550, type: "red" },
+        { t: 1650, type: "off" },
+        { t: 1720, type: "white" },
+        { t: 1800, type: "off" },
+        { t: 1870, type: "red" },
+        { t: 1950, type: "off" }
+    ];
+
+    timeline.forEach(event => {
+        setTimeout(() => {
+            if (event.type === "white") {
+                flash.style.opacity = 1;
+            } else if (event.type === "red") {
+                redflash.style.opacity = 0.9;
+            } else {
+                flash.style.opacity = 0;
+                redflash.style.opacity = 0;
+            }
+        }, event.t);
+    });
+
+    // Start flimren efter sidste blink
     setTimeout(() => {
         document.body.classList.add("flicker");
-    }, 1200);
+    }, 2100);
 }
 introFlash();
 
