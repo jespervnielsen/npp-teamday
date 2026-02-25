@@ -14,31 +14,23 @@ body {
     overflow: hidden;
 }
 
-/* FLASH OVERLAY */
-.flash {
+/* Flash overlays */
+.flash, .redflash {
     position: fixed;
     inset: 0;
-    background: white;
     opacity: 0;
     pointer-events: none;
     z-index: 9999;
 }
-
-.redflash {
-    position: fixed;
-    inset: 0;
-    background: red;
-    opacity: 0;
-    pointer-events: none;
-    z-index: 9998;
-}
+.flash { background: white; }
+.redflash { background: red; z-index: 9998; }
 
 /* Flicker */
 @keyframes flicker {
     0% { opacity: 1; }
     10% { opacity: 0.3; }
     20% { opacity: 1; }
-    30% { opacity: 0.2; }
+    30% { opacity: 0.4; }
     40% { opacity: 1; }
     100% { opacity: 1; }
 }
@@ -52,14 +44,13 @@ body {
     50% { text-shadow: -2px 0 red, 2px 0 blue; }
     100% { text-shadow: 2px 0 red, -2px 0 blue; }
 }
-
 .glitch {
-    font-size: 2.5rem;
+    font-size: 2.4rem;
     animation: glitch 1s infinite;
     text-align: center;
 }
 
-/* Container */
+/* Layout */
 .container {
     position: absolute;
     inset: 0;
@@ -74,28 +65,44 @@ body {
     border: 6px solid rgba(0,255,136,0.2);
     border-top: 6px solid #00ff88;
     border-radius: 50%;
-    width: 80px;
-    height: 80px;
+    width: 70px;
+    height: 70px;
     animation: spin 1s linear infinite;
     margin: 40px 0;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 
+/* Terminal */
 .terminal {
     font-size: 1.1rem;
     margin-top: 20px;
-    min-height: 160px;
+    min-height: 120px;
     width: 70%;
     text-align: left;
 }
 
+/* Button */
+button {
+    background: black;
+    color: #00ff88;
+    border: 2px solid #00ff88;
+    padding: 15px 30px;
+    font-size: 1.2rem;
+    cursor: pointer;
+    margin-top: 30px;
+    animation: glitch 1.5s infinite, flicker 3s infinite;
+}
+button:hover {
+    background: #00ff88;
+    color: black;
+}
+
+/* Video */
 video {
     max-width: 80%;
     border: 2px solid #00ff88;
     box-shadow: 0 0 20px #00ff88;
 }
-
-.hidden { display: none; }
 
 /* Scanlines */
 .scanline {
@@ -108,6 +115,8 @@ video {
     );
     pointer-events: none;
 }
+
+.hidden { display: none; }
 </style>
 </head>
 <body>
@@ -122,17 +131,20 @@ video {
     <div class="terminal" id="terminal"></div>
 </div>
 
+<div class="container hidden" id="buttonContainer">
+    <div class="glitch">ENCRYPTED MESSAGE READY</div>
+    <button id="viewBtn">Click to view secure message</button>
+</div>
+
 <div class="container hidden" id="videoContainer">
-    <div class="glitch">TRANSMISSION READY</div>
-    <p>Agent authentication required. Press play.</p>
-    <video controls>
+    <video id="missionVideo" controls>
         <source src="mission.mp4" type="video/mp4">
     </video>
 </div>
 
 <script>
 
-// Aggressive startup flash
+// Flash intro
 function introFlash() {
     const flash = document.getElementById("flash");
     const redflash = document.getElementById("redflash");
@@ -150,23 +162,15 @@ function introFlash() {
         document.body.classList.add("flicker");
     }, 1200);
 }
-
 introFlash();
 
-
-// Long terminal simulation
+// Terminal simulation
 const messages = [
 ">>> Incoming override signal...",
-">>> Verifying node integrity...",
 ">>> Establishing encrypted tunnel...",
 ">>> Generating session keys...",
-">>> AES-256 handshake initiated...",
-">>> Routing via offshore relay...",
-">>> Bypassing internal firewall...",
-">>> Masking origin...",
-">>> Switching to visual-only protocol...",
-">>> Awaiting field agents...",
-">>> Channel stabilising..."
+">>> AES-256 handshake complete...",
+">>> Secure visual protocol active..."
 ];
 
 let terminal = document.getElementById("terminal");
@@ -183,21 +187,25 @@ function typeWriter() {
             terminal.innerHTML += "<br>";
             msgIndex++;
             charIndex = 0;
-            setTimeout(typeWriter, 800);
+            setTimeout(typeWriter, 700);
         }
     }
 }
+setTimeout(typeWriter, 1500);
 
-// Start typing after 2 sec
-setTimeout(typeWriter, 2000);
-
-
-// TOTAL DELAY BEFORE VIDEO (3 minutes)
+// After 25 sec → show button
 setTimeout(() => {
     document.getElementById("bootSequence").classList.add("hidden");
+    document.getElementById("buttonContainer").classList.remove("hidden");
+}, 25000);
+
+// Button click → show video + autoplay
+document.getElementById("viewBtn").addEventListener("click", () => {
+    document.getElementById("buttonContainer").classList.add("hidden");
     document.getElementById("videoContainer").classList.remove("hidden");
-    document.body.classList.remove("flicker");
-}, 180000); // 180000 ms = 3 minutter
+    const video = document.getElementById("missionVideo");
+    video.play();
+});
 
 </script>
 
