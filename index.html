@@ -243,6 +243,7 @@ setTimeout(() => {
 
 // Button click → show video + autoplay
 document.getElementById("viewBtn").addEventListener("click", () => {
+    document.body.classList.remove("flicker");
     document.getElementById("buttonContainer").classList.add("hidden");
     document.getElementById("videoContainer").classList.remove("hidden");
     const video = document.getElementById("missionVideo");
