@@ -104,6 +104,15 @@ video {
     box-shadow: 0 0 20px #00ff88;
 }
 
+/* Coordinates */
+#coordinates {
+    margin-top: 20px;
+    font-size: 1.4rem;
+    letter-spacing: 0.1em;
+    text-shadow: 0 0 8px #00ff88;
+    text-align: center;
+}
+
 /* Scanlines */
 .scanline {
     position: fixed;
@@ -140,6 +149,7 @@ video {
     <video id="missionVideo" controls>
         <source src="https://jespervnielsen.github.io/npp-teamday/Mission_black_sheep_720p.mp4" type="video/mp4">
     </video>
+    <div id="coordinates" class="hidden">55.706816, 12.534438</div>
 </div>
 
 <script>
@@ -247,6 +257,14 @@ document.getElementById("viewBtn").addEventListener("click", () => {
     document.getElementById("videoContainer").classList.remove("hidden");
     const video = document.getElementById("missionVideo");
     video.play();
+});
+
+// Show coordinates at 32 seconds and keep them visible
+const missionVideo = document.getElementById("missionVideo");
+missionVideo.addEventListener("timeupdate", () => {
+    if (missionVideo.currentTime >= 32) {
+        document.getElementById("coordinates").classList.remove("hidden");
+    }
 });
 
 </script>
